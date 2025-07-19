@@ -1,18 +1,21 @@
-from fastapi import FastAPI
-import os
 import requests
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
-COINGLASS_API_KEY = os.environ.get("COINGLASS_API_KEY")
+COINGLASS_API_KEY = "your_actual_api_key_here"
 
 @app.get("/api/liquidations")
-def get_liquidations(symbol: str = "BTC"):
-    url = f"https://open-api.coinglass.com/api/pro/v2/liquidation?symbol={symbol}"
+def get_liquidation(symbol: str = "ETH"):
+    url = "https://open-api.coinglass.com/public/v2/liquidation_history"
     headers = {
-        "accept": "application/json",
         "coinglassSecret": COINGLASS_API_KEY
     }
-    response = requests.get(url, headers=headers)
-    return response.json()
-
+    params = {
+        "symbol": symbol,
+        "interval": "15m",  # Options: 5m, 15m, 1h, etc.
+        "currency": "USDT"
+    }
+    response = requests.get(url, headers=headers, params=params)
+    return JSONResponse(content=response.json())
