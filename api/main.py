@@ -1,8 +1,7 @@
 from fastapi import FastAPI
-import csv
 import requests
+import csv
 from io import StringIO
-import logging
 
 app = FastAPI()
 
@@ -15,33 +14,33 @@ def root():
 @app.get("/signals")
 def get_signals():
     try:
-        response = requests.get(CSV_URL, timeout=5)
+        response = requests.get(CSV_URL, timeout=10)
         response.raise_for_status()
 
         csv_data = StringIO(response.text)
         reader = csv.DictReader(csv_data)
 
-        top_signals = []
+        signals = []
         for row in reader:
-            # Skip completely empty or malformed rows
-            if not row.get("Coin"):
+            # Check that required fields are present
+            if not row.get("Coin") or not row.get("Direction"):
                 continue
-            signal = {
-                "coin": row.get("Coin", "").strip(),
-                "direction": row.get("Direction", "").strip(),
+
+            signals.append({
+                "coin": row["Coin"].strip(),
+                "direction": row["Direction"].strip(),
                 "confidence": row.get("Confidence", "").strip(),
                 "entry": row.get("Entry", "").strip(),
                 "tp1": row.get("TP1", "").strip(),
                 "tp2": row.get("TP2", "").strip(),
                 "sl": row.get("SL", "").strip(),
                 "timeframe": row.get("Timeframe", "").strip()
-            }
-            top_signals.append(signal)
-            if len(top_signals) == 3:
+            })
+
+            if len(signals) == 3:
                 break
 
-        return {"signals": top_signals or "No valid signals found in CSV."}
+        return {"signals": signals}
 
     except Exception as e:
-        logging.exception("Error fetching or parsing CSV")
         return {"error": str(e)}
