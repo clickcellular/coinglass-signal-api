@@ -1,14 +1,18 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import requests
 import os
+import requests
 
 app = FastAPI()
 
-# Allow frontend calls (adjust origin if needed)
+@app.get("/")
+def read_root():
+    return {"message": "CoinGlass API is working!"}
+
+# Allow frontend calls
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Or your frontend URL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
