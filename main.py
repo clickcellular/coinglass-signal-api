@@ -5,10 +5,9 @@ import os
 
 app = FastAPI()
 
-# Fetch your API key from Vercel environment variables
 COINGLASS_API_KEY = os.environ.get("COINGLASS_API_KEY")
 
-@app.get("/api/liquidations")
+@app.get("/liquidations")
 def get_liquidations(symbol: str = Query("ETH")):
     url = "https://open-api.coinglass.com/public/v2/liquidation_history"
     headers = {
@@ -16,7 +15,7 @@ def get_liquidations(symbol: str = Query("ETH")):
     }
     params = {
         "symbol": symbol,
-        "interval": "15m",  # You can change to 5m, 1h, etc.
+        "interval": "15m",
         "currency": "USDT"
     }
 
